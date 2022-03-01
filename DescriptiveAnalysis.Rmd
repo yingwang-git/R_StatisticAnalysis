@@ -1,0 +1,85 @@
+---
+title: "Descriptive Analysis"
+author: "wy"
+date: "2022/3/1"
+output: html_document
+---
+
+# 排查
+0. 假设是否正确
+1. 数据
+  1）数据是否正确
+  2）是否有离群值：看分布
+  3）样本量是否足够
+2. 变量
+  1）计算是否正确
+  2）有没有其他的测量方式？
+  3）合并测量？
+  4）控制变量的选择
+  5）是否有遗漏变量
+  6）变量滞后？
+3. 模型
+  1）模型是否合适？线性非线性？面板？
+  2）多重共线性
+  3）异方差：取对数/加权最小二乘法
+
+
+
+# outline (idea)
+
+# setup
+
+```{r}
+rm(list=ls())
+options(max.print = 1000)
+```
+
+```{r}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  readxl
+  )
+```
+
+# data
+## read data
+
+## generate variable
+
+## data filter
+
+# descriptive analysis
+## plot
+```{r}
+# hist() 看分布
+# boxplot() 看离群值
+
+matrix <- as.matrix(data[,c(3:5, 124)])
+PerformanceAnalytics::chart.Correlation(matrix, histogram = TRUE)
+```
+
+
+```{r}
+# 看分布是否均匀，主要集中在哪些区间
+table(cut(x, breaks = 10))
+```
+
+
+## descriptive
+
+```{r}
+# summary()
+# psych::describe()
+```
+
+
+# linear
+
+# non-linear
+
+# test
+```{r}
+# 异方差
+lmtest::bptest(lm)
+```
+
