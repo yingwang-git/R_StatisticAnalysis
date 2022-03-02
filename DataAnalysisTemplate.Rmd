@@ -1,0 +1,174 @@
+---
+title: "Data Analysis Template"
+author: "wy"
+date: "2022/3/1"
+output: html_document
+---
+
+
+
+# 数据处理问题的排查思路
+1. 数据
+  1）数据是否正确：数据来源、数据读取、数据类型等
+  2）是否有离群值：看分布
+  3）样本量是否足够
+2. 变量
+  1）计算是否正确
+  2）有没有其他的测量方式？
+  3）合并测量？
+  4）控制变量的选择
+  5）是否有遗漏变量
+  6）变量滞后？
+3. 模型
+  1）模型是否合适？线性非线性？面板？
+  2）多重共线性
+  3）异方差：取对数/加权最小二乘法
+
+
+# 数据进行初步分析的思路
+1. 数据读取
+2. 变量处理：变量转换、分组、计算等
+3. 数据筛选：只要某些行或某些列等
+4. 描述性分析：看数据分布情况、看相关性
+5. 选择模型进行分析
+6. 模型检验：比如回归中是否存在共线性、异方差等
+
+
+# setup
+
+```{r}
+rm(list=ls())  # 清理工作空间
+options(max.print = 1000)  # 设置打印长度
+```
+
+## 导入包
+```{r}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  readxl
+  )
+```
+
+# data
+## read data
+```{r}
+data <- readxl::read_excel("")
+data <- read.csv("")
+
+# 不建议attach(data)，数据多时容易混乱
+```
+
+
+## variable
+```{r}
+# 变量分组
+data$v_group <- ifelse(data$v > 0, "high", "low")
+
+# 变量转换
+data$v_log <- log(data$v) # 取对数
+data$v_log <- log(data$v + 1)  # 存在0的数据取对数
+
+# 变量计算
+data$z <- data$a + data$b  # + - * /
+```
+
+
+## data filter
+```{r}
+# 筛选行
+data_new <- data[data$v > 0, ]
+data_new <- data[which(data$v2%in%c("只要这组1", "只要这组2")),]
+data_new <- data[!which(data$v2%in%c("不要这组1", "不要这组2")),]
+
+# 筛选列
+data_new <- data[, c("只要这列1", "只要这列")]
+```
+
+
+# 数据基本情况
+## 看分布
+```{r}
+# 画图
+hist(data$v)  # 看分布
+boxplot(data$v)  # 看离群值
+
+# 看分布是否均匀，主要集中在哪些区间
+table(cut(data$v, breaks = 10))
+```
+
+## 看相关
+```{r}
+# 双变量相关
+cor.test(data$x, data$y)
+plot(data$x, data$y)  # 散点图
+
+# 多变量两两相关，画图
+matrix <- as.matrix(data[,c("x", "y", "z")])
+PerformanceAnalytics::chart.Correlation(matrix, histogram = TRUE)
+```
+
+
+# descriptive
+## 描述统计
+```{r}
+summary(data$x)
+psych::describe(data[, c(2:10)])
+```
+
+
+## 分组描述性
+```{r}
+# 分组计算均值，标准差，最小值，最大值，样本量
+doBy::summaryBy(data[, c(2:10)] ~ group_variable, 
+          data = data, FUN = c(mean, sd, min, max, length))  
+```
+
+
+# model
+## linear regression
+```{r}
+lm <- lm(y ~ x1 + x2 + x3, data = data)
+summary(lm)
+```
+
+## non-linear
+
+## glm
+
+## PSM
+
+
+# 问题检验
+```{r}
+# 共线性：vif值大于5或大于10则存在共线性问题
+car::vif(lm)
+
+# 异方差：显著则拒绝原假设，存在异方差问题
+lmtest::bptest(lm)
+```
+
+
+
+# 批量分析
+## 多个变量分别做因变量跑
+```{r}
+for (i in c(2:10)){
+  print(names(data[i]))
+  lm <- lm(data[[i]] ~ a + b + c, data = data)
+  result <- summary(lm)
+  print(result)
+}
+```
+
+## 多个变量分别做自变量跑
+```{r}
+for (i in c(2:10)){
+  print(names(data_cele[i]))
+  lm <- lm(y ~ data_cele[[i]] + control1 + control2, data = data)
+  result <- summary(lm)
+  result$coefficients <- result$coefficients[1:3,]  # 可以省略控制变量的输出
+  print(result)
+}
+```
+
+
