@@ -52,8 +52,9 @@ pacman::p_load(
 # data
 ## read data
 ```{r}
-data <- readxl::read_excel("")
-data <- read.csv("")
+data <- readxl::read_excel("")  # excel数据
+data <- read.csv("")  # csv数据
+data <- read.table("")  # txt数据
 
 # 不建议attach(data)，数据多时容易混乱
 ```
