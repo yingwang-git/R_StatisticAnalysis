@@ -41,13 +41,14 @@ rm(list=ls())  # 清理工作空间
 options(max.print = 1000)  # 设置打印长度
 ```
 
-## 导入包
+## package
 ```{r}
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
   readxl
   )
 ```
+
 
 # data
 ## read data
@@ -68,6 +69,8 @@ data$v_group <- ifelse(data$v > 0, "high", "low")
 # 变量转换
 data$v_log <- log(data$v) # 取对数
 data$v_log <- log(data$v + 1)  # 存在0的数据取对数
+data$v_scale <- scale(data$v, center = T, scale = T) # 
+
 
 # 变量计算
 data$z <- data$a + data$b  # + - * /
@@ -86,8 +89,8 @@ data_new <- data[, c("只要这列1", "只要这列")]
 ```
 
 
-# 数据基本情况
-## 看分布
+# descriptive
+## distribution
 ```{r}
 # 画图
 hist(data$v)  # 看分布
@@ -97,7 +100,24 @@ boxplot(data$v)  # 看离群值
 table(cut(data$v, breaks = 10))
 ```
 
-## 看相关
+
+## discriptive statistics
+```{r}
+summary(data$x)  # 单个描述
+psych::describe(data[, c(2:10)])  # 批量描述
+```
+
+
+## discriptive statistics by group
+
+```{r}
+# 分组计算均值，标准差，最小值，最大值，样本量
+doBy::summaryBy(data[, c(2:10)] ~ group_variable, 
+          data = data, FUN = c(mean, sd, min, max, length))  
+```
+
+
+## correlation
 ```{r}
 # 双变量相关
 cor.test(data$x, data$y)
@@ -109,21 +129,6 @@ PerformanceAnalytics::chart.Correlation(matrix, histogram = TRUE)
 ```
 
 
-# descriptive
-## 描述统计
-```{r}
-summary(data$x)
-psych::describe(data[, c(2:10)])
-```
-
-
-## 分组描述性
-```{r}
-# 分组计算均值，标准差，最小值，最大值，样本量
-doBy::summaryBy(data[, c(2:10)] ~ group_variable, 
-          data = data, FUN = c(mean, sd, min, max, length))  
-```
-
 
 # model
 ## linear regression
@@ -132,11 +137,82 @@ lm <- lm(y ~ x1 + x2 + x3, data = data)
 summary(lm)
 ```
 
-## non-linear
+## U-shaped
+```{r}
+# 1. 加入二次项
+lm <- lm(y ~ x + I(x^2) + c1 + c2 + c3, data = data)
+summary(lm)  # 二次项显著为正则为U型，显著为负则为倒U型
+
+# 2. 计算转折点
+# turning_point = -b/(2a)，其中a为二次项系数，b为一次项的系数
+result <- summary(lm)
+turning_point <- -(result$coefficients[2][1]/(2*(result$coefficients[3][1])))
+# 如果转折点在数据范围内或可能范围内，则U型关系确实成立
+
+# 3. 断点回归
+data$x_low <- ifelse(data$x < turning_point, data$x - turning_point, 0)
+data$x_high <- ifelse(data$x >= turning_point, data$x - turning_point, 0)
+data$x_bigb <- ifelse(data$x >= turning_point, 1, 0)
+
+lm <- lm(y ~ x_low + x_high + x_bigb + c1 + c2 + c3, data = data)
+summary(lm)  # x_low和x_high都显著，证明U型关系成立
+```
+
 
 ## glm
+### logistic
+```{r}
+glm <- glm(y ~ x1 + x2 + x3, data = data, family = binomial('logit'))  # y为二分类变量
+
+glm <- glm(y ~ x1 + x2 + x3, data = data, family = binomial('logit'), weights = v_weights)  # y为比例变量，weights为分母。如y为购买转化率=购买人数/浏览人数，则weights是浏览人数
+
+summary(glm)
+```
+
+
+## mediation
+```{r}
+# change digit behind comma in mediation print
+trace(mediation:::print.summary.mediate, 
+      at = 11,
+      tracer = quote({
+        printCoefmat <- function(x, digits) {
+          p <- x[, 4] #p-values seem to be stored rounded
+          x[, 1:3] <- sprintf("%.6f", x[, 1:3])
+          x[, 4] <- sprintf("%.2f", p)
+          print(x, quote = FALSE, right = TRUE)
+        } 
+      }),
+      print = FALSE)
+```
+
+
+```{r}
+lm0 <- lm(mediator ~ x + c1 + c2 + c3, data = data)
+# summary(lm0)
+
+lm1 <- lm(y ~ x + mediator+ c1 + c2 + c3, data = data)
+# summary(lm1)
+  
+set.seed(2021)
+med <- mediation::mediate(lm0, lm1, sims = 5000,  treat = "x", mediator = "mediator", control.value = "control", treat.value = "treat")  # control value是x中的控制组或基准组，如果x是连续变量，则不用 
+mediation:::print.summary.mediate(summary(med))
+```
+
+
 
 ## PSM
+```{r}
+PSM_data <- data_cele[, c('x', 'y', 'c1', 'c2', 'c3')]  # 只要做PSM的变量，自变量因变量控制变量
+PSM.1 <- MatchIt::matchit(x ~ c1 + c2 + c3, data = PSM_data, method = "nearest", distance="logit")  # x为二分类变量
+
+data_PSM.1 <- match.data(PSM.1)
+table1 <- tableone::CreateTableOne(vars = c('y', 'c1', 'c2', 'c3'), data = data_PSM.1, strata = "x") 
+
+table1 <- print(table1, printToggle = FALSE, noSpaces = TRUE) 
+knitr::kable(table1[,1:3], align = 'c',caption = 'Table')
+```
+
 
 
 # 问题检验
