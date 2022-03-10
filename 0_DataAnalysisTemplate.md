@@ -11,9 +11,7 @@ output:
     number_sections: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = FALSE)
-```
+
 
 
 # 数据分析思路
@@ -47,13 +45,15 @@ knitr::opts_chunk$set(eval = FALSE)
 
 # setup
 
-```{r}
+
+```r
 rm(list=ls())  # 清理工作空间
 options(max.print = 1000)  # 设置打印长度
 ```
 
 ## package
-```{r}
+
+```r
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
   readxl
@@ -63,7 +63,8 @@ pacman::p_load(
 
 # data
 ## read data
-```{r}
+
+```r
 data <- readxl::read_excel("")  # excel数据
 data <- read.csv("")  # csv数据
 data <- read.table("")  # txt数据
@@ -73,7 +74,8 @@ data <- read.table("")  # txt数据
 
 
 ## merge data
-```{r}
+
+```r
 data_merge <- cbind(data1, data2)  # 合并列（左右合并）
 data_merge <- rbind(data1, data2)  # 合并行（上下合并）
 
@@ -82,7 +84,8 @@ data_merge <- merge(data1, data2, by.x = "ID", by.y = "ID", all.x = TRUE)  # 根
 
 
 ## basic info
-```{r}
+
+```r
 head(data, 10)  # 数据预览
 dim(data)  # 数据维度
 str(data)  # 查看数据类型
@@ -91,7 +94,8 @@ names(data)  # 查看所有变量名
 
 
 ## NA
-```{r}
+
+```r
 # 统计各个变量的NA值数量
 pacman::p_load(dplyr)
 data %>%
@@ -101,12 +105,12 @@ data %>%
 
 # 删除NA值
 data_complete <- data[complete.cases(data[, c("x", "y")]), ]   # 关键变量没有缺失值
-
 ```
 
 
 ## variable
-```{r}
+
+```r
 # 生成变量
 data$v_group <- ifelse(data$v > 0, "high", "low") # 变量分组
 
@@ -135,7 +139,8 @@ unique(data$x)  # 每个水平是啥
 
 ## data aggregate
 
-```{r}
+
+```r
 # 分类汇总
 pacman::p_load(dplyr)
 data_aggregate <-
@@ -153,7 +158,8 @@ data$row_mean <- rowMeans(data[, 2:5])  # 按行计算2到5列的均值生成新
 
 
 ## data filter
-```{r}
+
+```r
 # 筛选行
 data_new <- data[data$v > 0, ]
 data_new <- data[data$v1 != "不要的数据", ]
@@ -177,7 +183,8 @@ data_new <- data[data$v <= high & data$v >= low, ]
 
 # descriptive
 ## distribution
-```{r}
+
+```r
 # 画图
 hist(data$v)  # 看分布
 boxplot(data$v)  # 看离群值
@@ -188,7 +195,8 @@ table(cut(data$v, breaks = 10))
 
 
 ## descriptive statistics
-```{r}
+
+```r
 summary(data$x)  # 单个描述
 psych::describe(data[, 2:10])  # 批量描述，基于列索引，第2到10列
 psych::describe(data[c('x', 'y', 'z')])  # 批量描述，基于列名
@@ -204,7 +212,8 @@ write.csv(descriptive_result, "descriptive_result.csv")
 
 ## descriptive statistics by group
 
-```{r}
+
+```r
 table(data$x)  # 分类变量分组计数
 
 # 分组计算均值，标准差，最小值，最大值，样本量
@@ -214,7 +223,8 @@ doBy::summaryBy(data[, 2:10] ~ group_variable,
 
 
 ## correlation
-```{r}
+
+```r
 # 双变量相关
 cor.test(data$x, data$y)  # 显著性
 plot(data$x, data$y)  # 散点图
@@ -233,7 +243,8 @@ correlations$P  # 显著性
 
 
 # plot
-```{r}
+
+```r
 # 好看的散点图+拟合线（自变量因变量都连续）
 
 ggplot2::ggplot(data, aes(x, y)) + 
@@ -265,14 +276,16 @@ ggsave("image.png", plot1, width = 6, height = 5, dpi = 600)
 
 # model
 ## linear regression
-```{r}
+
+```r
 lm <- lm(y ~ x1 + x2 + x3, data = data)
 summary(lm)
 summary(step(lm))  # 逐步回归
 ```
 
 ## U-shaped
-```{r}
+
+```r
 # 1. 加入二次项
 lm <- lm(y ~ x + I(x^2) + c1 + c2 + c3, data = data)
 summary(lm)  # 二次项显著为正则为U型，显著为负则为倒U型
@@ -295,7 +308,8 @@ summary(lm)  # x_low和x_high都显著，证明U型关系成立
 
 ## glm
 ### logistic
-```{r}
+
+```r
 glm <- glm(y ~ x1 + x2 + x3, data = data, family = binomial('logit'))  
 # y为二分类变量
 
@@ -306,14 +320,16 @@ summary(glm)
 ```
 
 ### probit
-```{r}
+
+```r
 glm <- glm(y ~ x1 + x2 + x3, data = data, family = binomial('probit'))
 summary(glm)
 ```
 
 
 ### possion
-```{r}
+
+```r
 poisson <- glm(y  ~ x1 + x2 + x3, data = data, family = poisson(link = "log"))
 # y为计数型变量
 
@@ -323,7 +339,8 @@ summary(poisson)
 
 
 ## mediation
-```{r}
+
+```r
 # change digit behind comma in mediation print
 trace(mediation:::print.summary.mediate, 
       at = 11,
@@ -339,7 +356,8 @@ trace(mediation:::print.summary.mediate,
 ```
 
 
-```{r}
+
+```r
 lm0 <- lm(mediator ~ x + c1 + c2 + c3, data = data)
 # summary(lm0)
 
@@ -354,14 +372,16 @@ mediation:::print.summary.mediate(summary(med))
 
 ## moderation
 ### interaction
-```{r}
+
+```r
 lm <- lm(y ~ x * w + c1 + c2, data = data)
 summary(lm)
 ```
 
 
 ### interaction plot
-```{r}
+
+```r
 labels <- list(X="x", W="w", Y="y", C1="c1", C2="c2")
 moderator <- list(name="w", site=list("c"))  # 可以多个moderator
 covar <- list(names=c("c1", "c2"), site=list("Y", "Y")) # 控制变量
@@ -371,7 +391,8 @@ interactions::interact_plot(model = lm, pred = x, modx = w, x.label = "x", y.lab
 
 
 ## PSM
-```{r}
+
+```r
 PSM_data <- data_cele[, c('x', 'y', 'c1', 'c2', 'c3')]  # 只要做PSM的变量，自变量、因变量、控制变量
 PSM.1 <- MatchIt::matchit(x ~ c1 + c2 + c3, data = PSM_data, method = "nearest", distance="logit")  # x为二分类变量
 
@@ -384,7 +405,8 @@ knitr::kable(table1[,1:3], align = 'c',caption = 'Table')
 
 
 ## Panel
-```{r}
+
+```r
 # 简易版
 data_panel <- plm::pdata.frame(data, index=c("individual", "year"))
 
@@ -394,13 +416,15 @@ summary(plm)
 
 
 ## PCA
-```{r}
+
+```r
 data$PCA_score <- prcomp(data[, 2:5], scale = TRUE, center = TRUE, rank. = 1)[['x']]  # [['x']]不更改
 ```
 
 
 # 问题检验
-```{r}
+
+```r
 # 共线性：vif值大于5或大于10则存在共线性问题
 car::vif(lm)
 
@@ -412,7 +436,8 @@ lmtest::bptest(lm)
 
 # 批量分析
 ## 多个因变量分别跑
-```{r}
+
+```r
 # 方法一
 for (i in c(2:5)){
   print(names(data[i]))
@@ -429,7 +454,8 @@ summary(lm)
 
 
 ## 多个自变量分别跑
-```{r}
+
+```r
 for (i in c(7:10)){
   print(names(data[i]))
   lm <- lm(y ~ data[[i]] + control1 + control2, data = data)
@@ -441,7 +467,8 @@ for (i in c(7:10)){
 
 
 ## 多个自变量和多个因变量分别跑
-```{r}
+
+```r
 for (i in c(7:10)){
   lm <- lm(paste0("cbind(y1, y2) ~ ", names(data[i]), "+ control1 + control2"), data = data)
   result <- summary(lm)
