@@ -1,8 +1,12 @@
 ---
 title: "Linear Regression"
-author: "wy"
+author: "W.Y."
 date: "2022/3/4"
-output: html_document
+documentclass: ctexart
+geometry: "left=2.5cm,right=2cm,top=3cm,bottom=2.5cm"
+output:
+  rticles::ctex:
+    fig_caption: yes
 ---
 
 # info
@@ -17,17 +21,29 @@ options(max.print = 1000)  # 设置打印长度
 
 
 ## package
-```{r}
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load(
-  
-  )
-```
 
 
 # data
 ## read data
 ```{r}
 data <- read.csv("data/data_LinearRegression.csv")
+```
+
+
+
+# descriptive analysis
+## data info
+```{r}
+head(data)  # 数据预览
+```
+
+
+```{r}
+str(data)  # all variables
+```
+
+## descriptive statistics
+```{r}
+summary(data)  # basic descriptive statistics
 ```
 
