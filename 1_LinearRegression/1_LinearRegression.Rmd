@@ -2,7 +2,9 @@
 title: "Linear Regression"
 author: "W.Y."
 date: "2022/3/4"
-output: rmarkdown::github_document
+output: 
+  html_document:
+    keep_md: true
 ---
 
 # info
@@ -32,7 +34,7 @@ options(max.print = 1000)  # 设置打印长度
 # data
 ## read data
 ```{r}
-data <- read.csv("data_LinearRegression.csv")
+data <- read.csv("1_LinearRegression/data_LinearRegression.csv")
 ```
 
 
