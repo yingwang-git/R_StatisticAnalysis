@@ -32,7 +32,7 @@ options(max.print = 1000)  # 设置打印长度
 # data
 ## read data
 ```{r}
-data <- read.csv("1_LinearRegression/data_LinearRegression.csv")
+data <- read.csv("../data/data_LinearRegression.csv")
 ```
 
 
