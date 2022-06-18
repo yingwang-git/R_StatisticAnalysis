@@ -1,6 +1,6 @@
 ---
 title: "Linear Regression"
-output: rmarkdown::md_document
+output: rmarkdown::github_document
 ---
 
 

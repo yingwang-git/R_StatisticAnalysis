@@ -1,3 +1,6 @@
+Linear Regression
+================
+
 # Table of Contents
 
 1.  [Data Information](#data-information)
@@ -10,79 +13,34 @@
 数据来源于《应用商务统计分析》第一章线性回归 （王汉生.
 应用商务统计分析\[M\]. 北京大学出版社, 2008.）
 
-<table>
-<thead>
-<tr class="header">
-<th>变量</th>
-<th>变量名称</th>
-<th>定义</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>因变量</td>
-<td>ROE</td>
-<td>来年的净资产收益率</td>
-</tr>
-<tr class="even">
-<td>自变量</td>
-<td>ROEt</td>
-<td>当年的净资产收益率</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td>ATO</td>
-<td>资产周转率</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>PM</td>
-<td>主营业务利润/主营业务收入</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td>LEV</td>
-<td>债务资本比率</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>GROWTH</td>
-<td>主营业务收入增长率</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td>PB</td>
-<td>市倍率</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>ARR</td>
-<td>应收账款/主营业务收入</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td>INV</td>
-<td>存货/资产总计</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>ASSET</td>
-<td>对数后的资产总计</td>
-</tr>
-</tbody>
-</table>
+| 变量   | 变量名称 | 定义                      |
+|--------|----------|---------------------------|
+| 因变量 | ROE      | 来年的净资产收益率        |
+| 自变量 | ROEt     | 当年的净资产收益率        |
+|        | ATO      | 资产周转率                |
+|        | PM       | 主营业务利润/主营业务收入 |
+|        | LEV      | 债务资本比率              |
+|        | GROWTH   | 主营业务收入增长率        |
+|        | PB       | 市倍率                    |
+|        | ARR      | 应收账款/主营业务收入     |
+|        | INV      | 存货/资产总计             |
+|        | ASSET    | 对数后的资产总计          |
 
 # Data Prepare
 
 ## read data
 
-    data <- read.csv("../data/data_LinearRegression.csv")
+``` r
+data <- read.csv("../data/data_LinearRegression.csv")
+```
 
 # descriptive analysis
 
 ## data info
 
-    head(data)  # 数据预览
+``` r
+head(data)  # 数据预览
+```
 
     ##   year   ROEt   ATO     PM    LEV GROWTH      PB    ARR   INV  ASSET    ROE
     ## 1 2002  0.296 0.389  0.215  4.384  0.197   8.048  0.637 0.248 20.873  0.181
@@ -92,7 +50,9 @@
     ## 5 2002  1.053 0.858 -0.154 -2.066  0.519   1.972  0.293 0.032 22.570  0.728
     ## 6 2002  0.590 0.528  0.197 -0.946 -1.441   2.405 -0.986 0.189 20.890  1.141
 
-    str(data)  # all variables
+``` r
+str(data)  # all variables
+```
 
     ## 'data.frame':    1000 obs. of  11 variables:
     ##  $ year  : int  2002 2002 2002 2002 2002 2002 2002 2002 2002 2002 ...
@@ -109,7 +69,9 @@
 
 ## descriptive statistics
 
-    summary(data)  # basic descriptive statistics
+``` r
+summary(data)  # basic descriptive statistics
+```
 
     ##       year           ROEt               ATO                PM         
     ##  Min.   :2002   Min.   :-1.39000   Min.   :-1.1910   Min.   :-0.4240  
@@ -135,6 +97,8 @@
 
 ## plot
 
-    hist(data$ROE)
+``` r
+hist(data$ROE)
+```
 
-![](E:/DataMining/Git_R_StatisticAnalysis/1_LinearRegression/1_LinearRegression_files/figure-markdown_strict/unnamed-chunk-5-1.png)
+![](E:/DataMining/Git_R_StatisticAnalysis/1_LinearRegression/1_LinearRegression_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
