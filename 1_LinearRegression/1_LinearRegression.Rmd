@@ -5,6 +5,14 @@ date: "2022/3/4"
 output: rmarkdown::github_document
 ---
 
+
+# Table of Contents
+1. [Example](#info)
+2. [Example2](#setup)
+3. [Third Example](#third-example)
+4. [Fourth Example](#fourth-examplehttpwwwfourthexamplecom)
+
+
 # info
 数据来源于《应用商务统计分析》第一章线性回归
 （王汉生. 应用商务统计分析[M]. 北京大学出版社, 2008.）  
@@ -32,7 +40,7 @@ options(max.print = 1000)  # 设置打印长度
 # data
 ## read data
 ```{r}
-data <- read.csv("../data/data_LinearRegression.csv")
+data <- read.csv("data/data_LinearRegression.csv")
 ```
 
 
